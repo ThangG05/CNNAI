@@ -1,0 +1,14 @@
+# Các file cài đặt thư viện (Tuyệt đối không push lên Git)
+node_modules/
+frontend/node_modules/
+backend/__pycache__/
+.env
+backend/.env
+
+# Các file mô hình AI hoặc dữ liệu nặng (Render và Vercel không cần lưu lịch sử các file này trên Git)
+*.h5
+*.keras
+*.pkl
+*.npy
+backend/model/
+backend/uploads/
