@@ -6,9 +6,3 @@ backend/__pycache__/
 backend/.env
 
 # Các file mô hình AI hoặc dữ liệu nặng (Render và Vercel không cần lưu lịch sử các file này trên Git)
-*.h5
-*.keras
-*.pkl
-*.npy
-backend/model/
-backend/uploads/
