@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { BACKEND_URL } from '../api/api';
 const ResultDisplay = ({
     result,
     prediction,
@@ -18,17 +18,22 @@ const ResultDisplay = ({
 
     const storedImage = sessionStorage.getItem('last_input_image');
 
+    const rawImage =
+    storedImage ||
+    finalResult?.captured_image ||
+    finalResult?.preview_image ||
+    finalResult?.input_image ||
+    finalResult?.image_url ||
+    finalResult?.image_path ||
+    finalResult?.image ||
+    finalResult?.uploaded_image ||
+    finalResult?.file_url ||
+    null;
+
     const imageSrc =
-        storedImage ||
-        finalResult?.captured_image ||
-        finalResult?.preview_image ||
-        finalResult?.input_image ||
-        finalResult?.image_url ||
-        finalResult?.image_path ||
-        finalResult?.image ||
-        finalResult?.uploaded_image ||
-        finalResult?.file_url ||
-        null;
+    rawImage && rawImage.startsWith('/uploads')
+        ? `${BACKEND_URL}${rawImage}`
+        : rawImage;
 
     console.log('ResultDisplay đang chạy');
     console.log('Ảnh lấy từ sessionStorage:', storedImage);
