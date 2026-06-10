@@ -153,30 +153,40 @@ const Home = () => {
         lastResultSignatureRef.current = null;
     };
 
-    /*
-      Đây là phần quan trọng nhất để đọc IP động.
-
-      Nếu bạn mở web bằng:
-      https://192.168.1.8:5173
-
-      thì QR tự tạo:
-      https://192.168.1.8:5173/?session=...
-
-      Nếu IP đổi, QR tự đổi theo.
-    */
     const mobileLink = sessionId
         ? `${window.location.origin}/?session=${sessionId}`
         : '';
 
     const qrCodeUrl = mobileLink
-        ? `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(mobileLink)}`
+        ? `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(mobileLink)}`
         : null;
 
     const phoneLocked = phoneReceiveCount >= MAX_PHONE_SEND;
 
+    const inputOptions = [
+        {
+            key: 'upload',
+            icon: '📁',
+            title: 'Upload ảnh',
+            desc: 'Chọn ảnh từ máy tính'
+        },
+        {
+            key: 'webcam',
+            icon: '🎥',
+            title: 'Webcam',
+            desc: 'Chụp ảnh trực tiếp'
+        },
+        {
+            key: 'phone',
+            icon: '📱',
+            title: 'Phone',
+            desc: 'Gửi ảnh từ điện thoại'
+        }
+    ];
+
     if (predictionResult) {
         return (
-            <div>
+            <div className="relative">
                 <Result
                     data={predictionResult}
                     result={predictionResult}
@@ -185,67 +195,61 @@ const Home = () => {
                 />
 
                 {inputType === 'phone' && (
-                    <div
-                        style={{
-                            position: 'fixed',
-                            right: '24px',
-                            bottom: '24px',
-                            zIndex: 9999,
-                            background: '#111827',
-                            color: '#ffffff',
-                            border: '1px solid #334155',
-                            borderRadius: '16px',
-                            padding: '14px 18px',
-                            boxShadow: '0 20px 40px rgba(0,0,0,0.35)',
-                            maxWidth: '340px'
-                        }}
-                    >
-                        <div style={{ fontWeight: 800, marginBottom: '6px' }}>
-                            📱 Phone QR
+                    <div className="fixed right-5 bottom-5 z-[9999] w-[calc(100%-40px)] max-w-sm rounded-3xl border border-slate-700/80 bg-slate-950/95 p-5 text-white shadow-2xl shadow-black/50 backdrop-blur-xl">
+                        <div className="flex items-start gap-3">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/15 text-2xl border border-blue-400/20">
+                                📱
+                            </div>
+
+                            <div className="flex-1">
+                                <div className="font-black text-lg">
+                                    Phone QR
+                                </div>
+
+                                <div className="mt-1 text-sm text-slate-400 leading-relaxed">
+                                    {phoneStatus}
+                                </div>
+
+                                <div className="mt-3">
+                                    <div className="mb-1 flex items-center justify-between text-xs text-slate-400">
+                                        <span>Đã nhận</span>
+                                        <span className="font-bold text-amber-300">
+                                            {phoneReceiveCount}/{MAX_PHONE_SEND} ảnh
+                                        </span>
+                                    </div>
+
+                                    <div className="h-2 w-full overflow-hidden rounded-full bg-slate-800">
+                                        <div
+                                            className="h-full rounded-full bg-gradient-to-r from-sky-400 to-purple-500"
+                                            style={{
+                                                width: `${Math.min(
+                                                    (phoneReceiveCount / MAX_PHONE_SEND) * 100,
+                                                    100
+                                                )}%`
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div style={{ fontSize: '14px', color: '#cbd5e1' }}>
-                            {phoneStatus}
+                        <div className="mt-4 grid grid-cols-2 gap-3">
+                            <button
+                                type="button"
+                                onClick={handleReset}
+                                className="rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-blue-500"
+                            >
+                                Quay lại
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={handleCreateNewQr}
+                                className="rounded-xl bg-purple-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-purple-500"
+                            >
+                                QR mới
+                            </button>
                         </div>
-
-                        <div style={{ marginTop: '8px', color: '#fbbf24', fontWeight: 700 }}>
-                            {phoneReceiveCount}/{MAX_PHONE_SEND} ảnh
-                        </div>
-
-                        <button
-                            type="button"
-                            onClick={handleReset}
-                            style={{
-                                marginTop: '10px',
-                                marginRight: '8px',
-                                border: 'none',
-                                borderRadius: '10px',
-                                padding: '8px 12px',
-                                color: '#ffffff',
-                                background: '#2563eb',
-                                fontWeight: 700,
-                                cursor: 'pointer'
-                            }}
-                        >
-                            Quay lại Phone
-                        </button>
-
-                        <button
-                            type="button"
-                            onClick={handleCreateNewQr}
-                            style={{
-                                marginTop: '10px',
-                                border: 'none',
-                                borderRadius: '10px',
-                                padding: '8px 12px',
-                                color: '#ffffff',
-                                background: '#9333ea',
-                                fontWeight: 700,
-                                cursor: 'pointer'
-                            }}
-                        >
-                            QR mới
-                        </button>
                     </div>
                 )}
             </div>
@@ -253,126 +257,206 @@ const Home = () => {
     }
 
     return (
-        <div className="min-h-screen w-full bg-[#0b0f19] text-slate-100 flex flex-col justify-start pb-12">
-            <div className="text-center my-12 px-4 max-w-4xl mx-auto">
-                <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4 bg-gradient-to-r from-white via-slate-200 to-slate-500 bg-clip-text text-transparent leading-tight">
-                    NHẬN DIỆN CẢM XÚC
-                </h1>
-                <p className="text-slate-400 text-base md:text-lg font-medium max-w-2xl mx-auto">
-                    Chọn phương thức để phân tích ảnh
-                </p>
-            </div>
+        <div className="relative min-h-screen w-full overflow-hidden bg-[#020617] text-slate-100">
+            <div className="pointer-events-none absolute -top-40 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-blue-600/20 blur-3xl" />
+            <div className="pointer-events-none absolute left-[-120px] top-40 h-80 w-80 rounded-full bg-purple-600/20 blur-3xl" />
+            <div className="pointer-events-none absolute bottom-[-160px] right-[-120px] h-96 w-96 rounded-full bg-cyan-600/10 blur-3xl" />
 
-            <div className="flex gap-4 justify-center mb-8 px-4 flex-wrap">
-                <button
-                    onClick={() => setInputType('upload')}
-                    className={`px-6 py-3.5 rounded-xl font-bold text-sm border transition ${
-                        inputType === 'upload'
-                            ? 'bg-blue-600 text-white border-blue-400'
-                            : 'bg-slate-900/60 text-slate-400 border-slate-800'
-                    }`}
-                >
-                    📁 Upload Ảnh
-                </button>
+            <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 pb-12 pt-10 md:px-8">
+                {/* HEADER */}
+                <div className="mx-auto mb-8 max-w-4xl text-center">
+                    <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-blue-400/20 bg-blue-500/10 px-4 py-2 text-sm font-bold text-blue-200">
+                        <span className="relative flex h-2.5 w-2.5">
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+                            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-400" />
+                        </span>
+                        Emotion AI System
+                    </div>
 
-                <button
-                    onClick={() => setInputType('webcam')}
-                    className={`px-6 py-3.5 rounded-xl font-bold text-sm border transition ${
-                        inputType === 'webcam'
-                            ? 'bg-blue-600 text-white border-blue-400'
-                            : 'bg-slate-900/60 text-slate-400 border-slate-800'
-                    }`}
-                >
-                    🎥 Webcam
-                </button>
+                    <h1 className="bg-gradient-to-r from-white via-blue-100 to-purple-300 bg-clip-text text-4xl font-black leading-tight tracking-tight text-transparent md:text-6xl">
+                        Nhận diện cảm xúc khuôn mặt
+                    </h1>
 
-                <button
-                    onClick={() => setInputType('phone')}
-                    className={`px-6 py-3.5 rounded-xl font-bold text-sm border transition ${
-                        inputType === 'phone'
-                            ? 'bg-blue-600 text-white border-blue-400'
-                            : 'bg-slate-900/60 text-slate-400 border-slate-800'
-                    }`}
-                >
-                    📱 Phone
-                </button>
-            </div>
+                    <p className="mx-auto mt-5 max-w-2xl text-base font-medium leading-relaxed text-slate-400 md:text-lg">
+                        Chọn một phương thức đầu vào để hệ thống phân tích khuôn mặt
+                        và trả về cảm xúc chủ đạo bằng mô hình AI.
+                    </p>
+                </div>
 
-            <div className="max-w-4xl w-full mx-auto px-4">
-                <div className="bg-slate-900/40 border border-slate-800 rounded-3xl p-8 shadow-2xl">
-                    {inputType === 'upload' && (
-                        <UploadImage
-                            onPredictionSuccess={(data) => setPredictionResult(data)}
-                        />
-                    )}
+                {/* INPUT TABS */}
+                <div className="mx-auto mb-8 grid w-full max-w-4xl grid-cols-1 gap-4 sm:grid-cols-3">
+                    {inputOptions.map((option) => {
+                        const active = inputType === option.key;
 
-                    {inputType === 'webcam' && (
-                        <WebcamCapture
-                            onPredictionSuccess={(data) => setPredictionResult(data)}
-                        />
-                    )}
-
-                    {inputType === 'phone' && (
-                        <div className="text-center">
-                            <h3 className="text-white text-xl font-bold mb-2">
-                                Quét QR bằng điện thoại
-                            </h3>
-
-                            <p className="text-slate-400 mb-2">
-                                Mở camera điện thoại để gửi ảnh
-                            </p>
-
-                            <p className="text-slate-400 mb-6">
-                                QR này dùng tối đa{' '}
-                                <span className="text-amber-400 font-bold">
-                                    {MAX_PHONE_SEND}
-                                </span>{' '}
-                                lần.
-                            </p>
-
-                            {qrCodeUrl ? (
-                                <div className="bg-white inline-block p-4 rounded-2xl mb-6">
-                                    <img
-                                        src={qrCodeUrl}
-                                        alt="QR Code"
-                                        className="w-44 h-44"
-                                    />
-                                </div>
-                            ) : (
-                                <div className="text-slate-500 mb-6 h-44 flex items-center justify-center">
-                                    Đang tạo mã QR...
-                                </div>
-                            )}
-
-                            <div
-                                className={`font-bold text-sm ${
-                                    phoneLocked ? 'text-red-500' : 'text-amber-500 animate-pulse'
+                        return (
+                            <button
+                                key={option.key}
+                                onClick={() => setInputType(option.key)}
+                                className={`group rounded-3xl border p-5 text-left transition-all duration-300 hover:-translate-y-1 ${
+                                    active
+                                        ? 'border-blue-400/60 bg-gradient-to-br from-blue-600/30 to-purple-600/25 shadow-xl shadow-blue-950/40'
+                                        : 'border-slate-800 bg-slate-900/55 hover:border-blue-400/30 hover:bg-slate-900'
                                 }`}
                             >
-                                {phoneStatus}
-                            </div>
-
-                            <div className="mt-3 text-slate-300 font-bold">
-                                Đã nhận: {phoneReceiveCount}/{MAX_PHONE_SEND}
-                            </div>
-
-                            <div className="mt-5 flex justify-center gap-3 flex-wrap">
-                                <button
-                                    type="button"
-                                    onClick={handleCreateNewQr}
-                                    className="px-5 py-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold transition"
+                                <div
+                                    className={`mb-4 flex h-12 w-12 items-center justify-center rounded-2xl text-2xl border ${
+                                        active
+                                            ? 'border-white/20 bg-white/15'
+                                            : 'border-slate-700 bg-slate-950/70'
+                                    }`}
                                 >
-                                    🔄 Tạo QR mới
-                                </button>
-                            </div>
+                                    {option.icon}
+                                </div>
 
-                            {mobileLink && (
-                                <div className="mt-5 text-xs text-slate-500 break-all">
-                                    Link: {mobileLink}
+                                <h3 className="text-lg font-black text-white">
+                                    {option.title}
+                                </h3>
+
+                                <p className="mt-1 text-sm text-slate-400">
+                                    {option.desc}
+                                </p>
+                            </button>
+                        );
+                    })}
+                </div>
+
+                {/* MAIN CARD */}
+                <div className="mx-auto w-full max-w-4xl">
+                    <div className="overflow-hidden rounded-[2rem] border border-slate-800 bg-slate-900/65 shadow-2xl shadow-black/30 backdrop-blur-xl">
+                        <div className="border-b border-slate-800 px-6 py-5 md:px-8">
+                            <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                                <div>
+                                    <h2 className="text-xl font-black text-white">
+                                        {inputType === 'upload' && 'Tải ảnh lên để phân tích'}
+                                        {inputType === 'webcam' && 'Chụp ảnh bằng webcam'}
+                                        {inputType === 'phone' && 'Gửi ảnh từ điện thoại'}
+                                    </h2>
+
+                                    <p className="mt-1 text-sm text-slate-400">
+                                        {inputType === 'upload' &&
+                                            'Hỗ trợ chọn ảnh trực tiếp từ thiết bị của bạn.'}
+                                        {inputType === 'webcam' &&
+                                            'Cho phép trình duyệt truy cập camera để chụp ảnh.'}
+                                        {inputType === 'phone' &&
+                                            'Quét mã QR bằng điện thoại để gửi ảnh về hệ thống.'}
+                                    </p>
+                                </div>
+
+                                <div className="w-fit rounded-full border border-slate-700 bg-slate-950/70 px-3 py-1.5 text-xs font-bold text-slate-400">
+                                    {inputType === 'phone'
+                                        ? `${phoneReceiveCount}/${MAX_PHONE_SEND} ảnh`
+                                        : 'Ready'}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="p-5 md:p-8">
+                            {inputType === 'upload' && (
+                                <UploadImage
+                                    onPredictionSuccess={(data) => setPredictionResult(data)}
+                                />
+                            )}
+
+                            {inputType === 'webcam' && (
+                                <WebcamCapture
+                                    onPredictionSuccess={(data) => setPredictionResult(data)}
+                                />
+                            )}
+
+                            {inputType === 'phone' && (
+                                <div className="text-center">
+                                    <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-3xl border border-blue-400/20 bg-blue-500/10 text-3xl">
+                                        📱
+                                    </div>
+
+                                    <h3 className="text-2xl font-black text-white">
+                                        Quét QR bằng điện thoại
+                                    </h3>
+
+                                    <p className="mx-auto mt-3 max-w-md text-slate-400">
+                                        Mở camera điện thoại, quét mã QR bên dưới, sau đó chọn
+                                        hoặc chụp ảnh để gửi về máy tính.
+                                    </p>
+
+                                    <div className="mt-7">
+                                        {qrCodeUrl ? (
+                                            <div className="inline-block rounded-[2rem] border border-slate-700 bg-white p-5 shadow-2xl shadow-black/30">
+                                                <img
+                                                    src={qrCodeUrl}
+                                                    alt="QR Code"
+                                                    className="h-56 w-56"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className="mx-auto flex h-56 w-56 items-center justify-center rounded-[2rem] border border-dashed border-slate-700 bg-slate-950/60 text-slate-500">
+                                                Đang tạo mã QR...
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div
+                                        className={`mx-auto mt-6 max-w-md rounded-2xl border px-5 py-4 text-sm font-bold ${
+                                            phoneLocked
+                                                ? 'border-red-400/30 bg-red-500/10 text-red-300'
+                                                : 'border-amber-400/25 bg-amber-500/10 text-amber-300'
+                                        }`}
+                                    >
+                                        <div className={phoneLocked ? '' : 'animate-pulse'}>
+                                            {phoneStatus}
+                                        </div>
+
+                                        <div className="mt-3">
+                                            <div className="mb-1 flex justify-between text-xs text-slate-400">
+                                                <span>Tiến độ nhận ảnh</span>
+                                                <span>
+                                                    {phoneReceiveCount}/{MAX_PHONE_SEND}
+                                                </span>
+                                            </div>
+
+                                            <div className="h-2 overflow-hidden rounded-full bg-slate-800">
+                                                <div
+                                                    className="h-full rounded-full bg-gradient-to-r from-sky-400 via-blue-500 to-purple-500"
+                                                    style={{
+                                                        width: `${Math.min(
+                                                            (phoneReceiveCount / MAX_PHONE_SEND) * 100,
+                                                            100
+                                                        )}%`
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-6 flex flex-wrap justify-center gap-3">
+                                        <button
+                                            type="button"
+                                            onClick={handleCreateNewQr}
+                                            className="rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-3 font-black text-white shadow-lg shadow-blue-950/40 transition hover:from-blue-500 hover:to-purple-500"
+                                        >
+                                            🔄 Tạo QR mới
+                                        </button>
+                                    </div>
+
+                                    {mobileLink && (
+                                        <div className="mx-auto mt-6 max-w-xl rounded-2xl border border-slate-800 bg-slate-950/70 p-4 text-left">
+                                            <p className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">
+                                                Link cho điện thoại
+                                            </p>
+
+                                            <p className="break-all text-xs leading-relaxed text-slate-400">
+                                                {mobileLink}
+                                            </p>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>
-                    )}
+                    </div>
+                </div>
+
+                {/* FOOTER NOTE */}
+                <div className="mx-auto mt-8 max-w-4xl text-center text-sm text-slate-500">
+                    Hệ thống hỗ trợ phân tích từ ảnh tải lên, webcam và điện thoại trong cùng mạng.
                 </div>
             </div>
         </div>
