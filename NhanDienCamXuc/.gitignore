@@ -1,8 +1,23 @@
-# Các file cài đặt thư viện (Tuyệt đối không push lên Git)
-node_modules/
-frontend/node_modules/
-backend/__pycache__/
+# --- SECURITY ---
+# Loại bỏ tất cả các file .env ở bất kỳ đâu trong project
 .env
-backend/.env
+.env.local
+.env.*.local
 
-# Các file mô hình AI hoặc dữ liệu nặng (Render và Vercel không cần lưu lịch sử các file này trên Git)
+# --- PYTHON (Backend) ---
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.venv/
+
+# --- NODE (Frontend) ---
+node_modules/
+dist/
+build/
+.eslintcache
+
+# --- OS ---
+.DS_Store
+Thumbs.db
