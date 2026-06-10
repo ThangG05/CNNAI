@@ -19,7 +19,6 @@ const ResultDisplay = ({
     const storedImage = sessionStorage.getItem('last_input_image');
 
     const rawImage =
-    storedImage ||
     finalResult?.captured_image ||
     finalResult?.preview_image ||
     finalResult?.input_image ||
@@ -28,6 +27,7 @@ const ResultDisplay = ({
     finalResult?.image ||
     finalResult?.uploaded_image ||
     finalResult?.file_url ||
+    storedImage ||
     null;
 
     const imageSrc =
